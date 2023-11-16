@@ -8,10 +8,6 @@ import time
 import pytesseract
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-t = time.localtime()
-
-current_time = time.strftime("%H",t)
-print("Current Time =", current_time)
 
 path = os.path.dirname(__file__)
 Test_folder_path = path + '\\GTSRB\\Test\\'
@@ -28,51 +24,6 @@ available_times = [('6','19'),('19','6')]
 # Load model
 model = load_model(path+'\CNN_model_all')
 
-def check_secondary_sign(frame):
-    
-    # cv2.imshow('Supplementary reference frame', frame)
-    # Convert the frame to grayscale
-    gray_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Apply a Gaussian blur to smooth out the noise
-    blur_img = cv2.GaussianBlur(gray_img, (5, 5), 0)
-
-    # Apply Canny edge detection to detect edges
-    edges_img = cv2.Canny(blur_img, 100, 200)
-    
-    # cv2.imshow('Supplementary edges', edges_img)
-
-    # # Apply morphological closing to fill in any gaps in the edges
-    # kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (1 , 1))
-    # closed_img = cv2.morphologyEx(edges_img, cv2.MORPH_CLOSE, kernel)
-    # cv2.imshow('Supplementary closed edges', closed_img)
-
-    contours, _ = cv2.findContours(edges_img.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    # Loop over the contours to find the speed limit sign
-    for cnt in contours:
-        # Approximate the contour to a polygon
-        area = cv2.contourArea(cnt)
-        perimeter = 0.03 * cv2.arcLength(cnt, True) # 0.03 is the epsilon (error margin)
-        approx = cv2.approxPolyDP(cnt, perimeter, True)
-        
-        # Get the number of sides of the approximated polygon
-        if(len(approx)==4) and area>300:
-            x_s, y_s, w_s, h_s = cv2.boundingRect(cnt)
-            # Extract the ROI of the secondary sign
-            s_sign_roi = frame[y_s:y_s + h_s, x_s:x_s + w_s]
-            # Convert the ROI to grayscale
-            gray_sign_roi = cv2.cvtColor(s_sign_roi, cv2.COLOR_BGR2GRAY)
-            # Perform character recognition using Tesseract
-            config = '--psm 8 -c tessedit_char_whitelist=-0123456789h'
-            text = pytesseract.image_to_string(gray_sign_roi, config=config)
-            parts = text.split('-')
-            numbers = []
-            for part in parts:
-                number = ''.join(filter(str.isdigit, part))  # Extract digits from each part
-                numbers.append(number)
-            numbers_all.append(numbers)
-            # cv2.imshow('Supplementary sign roi', s_sign_roi)
 
 # Open the camera
 cap = cv2.VideoCapture(0)
@@ -167,23 +118,6 @@ while True:
             # Draw a bounding box around the sign
             x, y, w, h = cv2.boundingRect(cnt)
             # cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            
-            # Extract possible ROI for secondary sign  
-            x_l = x-int(0.5*w)
-            x_r = x+w+int(0.5*w)
-            y_l = y+int(0.9*h)
-            y_u = y+h+h
-            # Check if outside of bounds
-            if(x_l<0):
-                x_l=0
-            if(x_r>=960):
-                x_r = 959
-            if(y_l<0):
-                y_l=0
-            if(y_u>=540):
-                y_u = 539
-            check_secondary_sign(frame[y_l:y_u ,x_l:x_r])
-
             # Extract the ROI of the sign
             sign_roi = frame[y: y + h, x: x + w]
             sign_roi = cv2.resize(sign_roi , (40, 40))

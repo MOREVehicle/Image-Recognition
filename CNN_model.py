@@ -17,13 +17,14 @@ from matplotlib import style
 
 style.use('fivethirtyeight')
 
-data_dir = '/home/more/Documents/GitHub/Image-Recognition/archive'
-train_path = '/home/more/Documents/GitHub/Image-Recognition/archive/train'
-test_path = '/home/more/Documents/GitHub/Image-Recognition/archive'
+path = os.path.dirname(__file__)
+data_dir = path + '\\archive\\'
+train_path = path +'\\archive\\train\\'
+test_path = path + '\\archive\\'
 
 # Resizing the images to 30x30x3
-IMG_HEIGHT = 480
-IMG_WIDTH = 480
+IMG_HEIGHT = 32
+IMG_WIDTH = 32
 channels = 3
 
 NUM_CATEGORIES = len(os.listdir(train_path))
