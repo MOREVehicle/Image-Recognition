@@ -1,16 +1,15 @@
+import os
+
+import cv2
 import numpy as np
 import pandas as pd
-import os
-import cv2
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow import keras
 from PIL import Image
-from sklearn.model_selection import train_test_split
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow import keras
 from keras.optimizers.legacy import Adam
+from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import accuracy_score
-from keras.models import load_model
+from sklearn.model_selection import train_test_split
+
 
 np.random.seed(42)
 
@@ -18,17 +17,18 @@ from matplotlib import style
 
 style.use('fivethirtyeight')
 
-data_dir = '/home/anton/Documents/GTSRB_Dataset/archive'
-train_path = '/home/anton/Documents/GTSRB_Dataset/archive/train'
-test_path = '/home/anton/Documents/GTSRB_Dataset/archive'
+path = os.path.dirname(__file__)
+data_dir = path + '\\archive\\'
+train_path = path +'\\archive\\train\\'
+test_path = path + '\\archive\\'
 
 # Resizing the images to 30x30x3
-IMG_HEIGHT = 480
-IMG_WIDTH = 480
+IMG_HEIGHT = 32
+IMG_WIDTH = 32
 channels = 3
 
 NUM_CATEGORIES = len(os.listdir(train_path))
-q
+
 # Label Overview
 classes = {0: 'Speed limit (20km/h)',
            1: 'Speed limit (30km/h)',
